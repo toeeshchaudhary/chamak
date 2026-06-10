@@ -1,0 +1,158 @@
+# Chamak Investor Interview — plain-language script.
+#
+# Every question is phrased for a regular investor. Internal answer values
+# stay the same as before so the archetype classifier keeps working.
+
+version: 1
+
+questions:
+
+  - id: horizon
+    text: "How long do you usually hold a stock once you buy it?"
+    kind: choice
+    options:
+      - {value: short,   label: "A few months at most"}
+      - {value: medium,  label: "One to three years"}
+      - {value: long,    label: "Three years or more"}
+      - {value: forever, label: "I treat it like buying a business — I don't plan to sell"}
+    beliefs:
+      - when: long
+        label: "Long-term mindset"
+        description: "Holding 3+ years lets the business itself drive returns, not market noise."
+        rules:
+          - {metric: years_since_listing, op: ">", value: 10, polarity: prefer, weight: 0.5}
+      - when: forever
+        label: "Owner mindset"
+        description: "Buying companies, not tickers — quality and longevity matter most."
+        rules:
+          - {metric: roe,                 op: ">", value: 15, polarity: prefer, weight: 1.0}
+          - {metric: years_since_listing, op: ">", value: 10, polarity: prefer, weight: 0.5}
+
+  - id: capital_cr
+    text: "Roughly how much do you have to invest (in ₹ lakhs)? Just a ballpark."
+    kind: number
+
+  - id: risk
+    text: "How would you describe your nerves when stocks drop?"
+    kind: choice
+    options:
+      - {value: low,     label: "I want to sleep well at night — steady is fine"}
+      - {value: medium,  label: "I can stomach normal ups and downs"}
+      - {value: high,    label: "Big drops don't shake me — I look for bargains"}
+    beliefs:
+      - when: low
+        label: "Capital preservation first"
+        description: "Sleep-well-at-night portfolio — avoid leverage and wild swings."
+        rules:
+          - {metric: debt_to_equity, op: "<", value: 0.5, polarity: prefer, weight: 1.5}
+          - {metric: current_ratio,  op: ">", value: 1.5, polarity: prefer, weight: 0.8}
+          - {metric: beta,           op: "<", value: 1.0, polarity: prefer, weight: 0.5}
+      - when: high
+        label: "Comfortable with volatility"
+        description: "Willing to ride drawdowns in exchange for higher growth."
+        rules:
+          - {metric: revenue_growth, op: ">", value: 15, polarity: prefer, weight: 1.2}
+
+  - id: debt
+    text: "How do you feel about a company being in debt?"
+    kind: choice
+    options:
+      - {value: averse,  label: "Avoid debt — they should fund themselves"}
+      - {value: ok,      label: "Some debt is fine if they can clearly pay it"}
+      - {value: comfy,   label: "Debt is OK if it's fuelling real growth"}
+    beliefs:
+      - when: averse
+        label: "Low-debt preference"
+        description: "Companies should fund themselves, not lean on banks."
+        rules:
+          - {metric: debt_to_equity, op: "<", value: 0.3, polarity: prefer, weight: 1.5}
+      - when: ok
+        label: "Moderate-debt tolerance"
+        description: "Debt is fine when the business comfortably services it."
+        rules:
+          - {metric: debt_to_equity, op: "<", value: 1.0, polarity: prefer, weight: 0.8}
+
+  - id: valuation
+    text: "What's your gut feeling about paying up for a stock?"
+    kind: choice
+    options:
+      - {value: value,    label: "I want a bargain — only buy when it's clearly cheap"}
+      - {value: garp,     label: "Fair price for what I'm getting"}
+      - {value: growth,   label: "Happy to pay up if the business is growing fast"}
+      - {value: agnostic, label: "Price doesn't matter much if the business is truly great"}
+    beliefs:
+      - when: value
+        label: "Value discipline"
+        description: "Margin of safety — don't overpay even for a good business."
+        rules:
+          - {metric: pe, op: "<", value: 20, polarity: prefer, weight: 1.2}
+          - {metric: pb, op: "<", value: 3,  polarity: prefer, weight: 0.8}
+      - when: garp
+        label: "Growth at a reasonable price"
+        description: "Pay fair price, get fair growth."
+        rules:
+          - {metric: peg, op: "<", value: 1.5, polarity: prefer, weight: 1.0}
+          - {metric: revenue_growth, op: ">", value: 10, polarity: prefer, weight: 1.0}
+      - when: growth
+        label: "Growth-first"
+        description: "Compounders earn their premium — buy and hold."
+        rules:
+          - {metric: revenue_growth,  op: ">", value: 15, polarity: prefer, weight: 1.5}
+          - {metric: earnings_growth, op: ">", value: 15, polarity: prefer, weight: 1.0}
+      - when: agnostic
+        label: "Quality over price"
+        description: "A great business at a fair price beats a fair business at a great price."
+        rules:
+          - {metric: roe,  op: ">", value: 20, polarity: prefer, weight: 1.5}
+          - {metric: roce, op: ">", value: 20, polarity: prefer, weight: 1.5}
+
+  - id: quality
+    text: "When you look at a great business, what gives it away? (pick a few)"
+    kind: multi
+    options:
+      - {value: high_roe,     label: "It earns a lot on the money invested in it"}
+      - {value: high_margin,  label: "It keeps a big chunk of each rupee as profit"}
+      - {value: cash,         label: "It throws off real cash, not just paper profits"}
+      - {value: longevity,    label: "It's been around forever and never blown up"}
+      - {value: brand,        label: "It has a brand or position competitors can't touch"}
+    beliefs:
+      - when: high_roe
+        label: "High ROCE bar"
+        description: "The business should earn well on every rupee deployed."
+        rules:
+          - {metric: roce, op: ">", value: 18, polarity: prefer, weight: 1.2}
+      - when: high_margin
+        label: "Margin discipline"
+        description: "Wide margins suggest pricing power."
+        rules:
+          - {metric: operating_margin, op: ">", value: 15, polarity: prefer, weight: 1.0}
+      - when: cash
+        label: "Cash-flow first"
+        description: "Real cash beats accounting profit."
+        rules:
+          - {metric: fcf_yield, op: ">", value: 3, polarity: prefer, weight: 1.0}
+      - when: longevity
+        label: "Long track record"
+        description: "Survival is its own signal."
+        rules:
+          - {metric: years_since_listing, op: ">", value: 10, polarity: prefer, weight: 0.7}
+
+  - id: management
+    text: "How much do you care about who's actually running the company? (1 = not really, 5 = a lot)"
+    kind: scale
+    range: [1, 5]
+    beliefs:
+      - when_min: 4
+        label: "Trust the operator"
+        description: "Founders with skin in the game and clean records."
+        rules:
+          - {metric: promoter_holding, op: ">", value: 40, polarity: prefer, weight: 1.0}
+          - {metric: pledged_pct,      op: "<", value: 5,  polarity: prefer, weight: 1.5}
+
+  - id: philosophy
+    text: "In your own words: what does a good stock look like to you?"
+    kind: text
+
+  - id: bad_experiences
+    text: "Anything that's a definite NO for you? (e.g. heavy debt, scandals, hype stocks)"
+    kind: text
