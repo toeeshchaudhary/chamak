@@ -1,0 +1,55 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "chamak"
+version = "0.1.0"
+description = "Investor reasoning engine — a graph of how you think, applied to Indian markets."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [{ name = "Rizwan Nur" }]
+
+dependencies = [
+  "textual>=0.80",
+  "typer>=0.12",
+  "pydantic>=2.7",
+  "networkx>=3.3",
+  "pyyaml>=6.0",
+  "platformdirs>=4.2",
+  "httpx>=0.27",
+  "python-ulid>=2.7",
+  "yfinance>=0.2.40",
+  "rich>=13.7",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+  "pytest-asyncio>=0.23",
+  "ruff>=0.5",
+]
+
+[project.scripts]
+chamak = "chamak.cli:app"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/chamak"]
+
+[tool.hatch.build]
+include = [
+  "src/chamak/**/*.py",
+  "src/chamak/**/*.yaml",
+  "src/chamak/**/*.sql",
+  "data/*.json",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
