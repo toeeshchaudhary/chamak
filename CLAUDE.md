@@ -10,7 +10,7 @@ object: a **MindMap** (called "Investing Style" in the UI) — a graph of
 beliefs + rules. Recommendations are an *output* of evaluating stocks
 against the graph, never a prediction of future prices.
 
-Authors: Toeesh Chaudhary (main), Harsh Sharma (testing/feedback). Both 12 A.
+Author: Toeesh Chaudhary. 12 A.
 
 ## Running
 

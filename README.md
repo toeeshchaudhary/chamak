@@ -135,7 +135,6 @@ Run that before any screen recording — it seeds the data, scores against every
 ## Credits
 
 - **Toeesh Chaudhary** (12th A) — design, architecture, implementation.
-- **Harsh Sharma** (12th A) — testing, ideas, feedback.
 
 Chamak is built for learning, not live trading — numbers in demo mode are illustrative only.
 
